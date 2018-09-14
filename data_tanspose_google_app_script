@@ -1,0 +1,25 @@
+function transpose() {
+
+  // get all the data in the sheet
+  var targetspreadsheet = SpreadsheetApp.getActiveSpreadsheet(); // Active        spreadsheet of the key file
+  var sheet = targetspreadsheet.getSheetByName('Data Source Sheet Name'); // Change the sheet name 
+  var tran_sheet = targetspreadsheet.getSheetByName('Tanspose Sheet tab Name'); // Change the sheet name 
+  var temp = sheet.getRange("B1:AH25").getValues();
+  var range = sheet.getDataRange();
+  var values = range.getValues();
+  Logger.log(values);  
+//  tran_sheet.getRange("A1:AG25").setValues(temp);
+  var range = tran_sheet.getDataRange();
+  Logger.log(tran_sheet);
+  // transpose it & write it out
+  tran_sheet.getRange(1,1,values[0].length,values.length)
+    .setValues(Object.keys(values[0]).map ( function (columnNumber) {
+      return values.map( function (row) {
+        return row[columnNumber];
+      });
+    }));
+  
+  
+//  Logger.log(temp);
+    
+}

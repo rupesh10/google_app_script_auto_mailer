@@ -1,0 +1,102 @@
+function getContentFromSheet (spreadSheet, sheetName, text) {
+  var responses = spreadSheet.getSheetByName(sheetName);
+  var result = composeHtmlMsg(responses, text);
+  var messageHTML = result.message;
+  var values = result.values
+  var shouldSendMail = checkValues(values)
+  return {
+    messageHTML: messageHTML,
+    shouldSendMail: shouldSendMail
+  }
+}
+
+function testMail (){
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  
+  var result = getContentFromSheet(ss, "Sheet tab Name", "Hi all, <br><br> Please find below the summary")
+  var streamresult = getContentFromSheet(ss, "Sheet tab Name", "<br><br> Please note that the below metrics is for India.")
+  
+  
+  if (result.shouldSendMail) {
+    var dailyMessage_1 = result.messageHTML
+    var totalMessage = dailyMessage_1 + '<br><br>' + 'Please Note that Daily avg rating & rating volume '
+    
+    var dailyMessage_stream = streamresult.messageHTML
+    var streamMessage = dailyMessage_stream //+ '<br><br>' //+ 'Please Note that streaming number only for India country'
+    
+    var finalMessage =  totalMessage + streamMessage
+    
+    finalMessage += '<br><br>Please check the sheet here: <a href= " sheet link ">Sheet</a>'
+ 
+    var email_address = "mail id with comma seprated"    
+    MailApp.sendEmail(email_address,'Report Subject Name', "",{'htmlBody':finalMessage});  
+  } else {
+
+    if (streamresult.shouldSendMail) {
+    var dailyMessage_stream = streamresult.messageHTML
+    var streamMessage = dailyMessage_stream + '<br><br>' //+ 'Please Note that streaming number only for India country'
+    
+    var finalMessage =  '<br><br>' + streamMessage
+    
+    finalMessage += '<br><br>Please check the sheet here: <a href="https://docs.google.com/spreadsheets/d/1-8gTELPAeM7lBm4WMRie6K1KaUwVoXy8YqdQKLOp17w/edit#gid=2113417462">Sheet</a>'
+ 
+    var email_address = "mail id with comma seprated"    
+    MailApp.sendEmail(email_address,'subject name of report', "",{'htmlBody':finalMessage}); 
+        
+  }
+  
+  }
+  
+}
+
+function composeHtmlMsg(responses, text){
+  //var message = '<bHere are the data you submitted :<br><br><table style="background-color:lightblue;border-collapse:collapse;" border = 1 cellpadding = 5><th>data</th><th>Values</th><tr>'
+  var message = '<b>'+text+'</b><br><br><br><table style="background-color:white;border-collapse:collapse;"border=1;cellpadding=5>'
+  var lastRow = responses.getLastRow();
+  var lastColumn = responses.getLastColumn();
+
+  var values = []
+  for(var i=1; i<=lastRow; i++) {
+    message += '<tr>'
+    var tempArray = []
+    for(var j=1; j<=lastColumn; j++) {
+      var value = responses.getRange(i, j).getValue();
+      //value = value || 'NA'
+      if (j === 10 && value) {
+        if (!isNaN(value)) {
+          value = Math.round(value * 10000)/100
+          value += "%"
+        }
+      }
+      value = value + ""
+      if (value.indexOf("GMT") !== -1) {
+        var dateParts = value.split(" ")
+        value = dateParts[2] + " " + dateParts[1] + ", " + dateParts[3]
+      }
+      if (i == 1 || j == 1 ) {
+        message += '<td style="background-color:#1B4F72;color:white;width:2000px;text-align:center">'+value+'</td>'
+      } else {
+        message += '<td style="width: 300px;text-align:center">'+value+'</td>'
+      }
+      tempArray.push(value)
+    }
+    message+= '</tr>'
+    values.push(tempArray)
+  }
+  message += '</table>'
+  return { 
+    message: message,
+    values: values
+  }
+}
+
+
+function checkValues(values) {
+  var shouldSendMail = false
+  for (var i = 2; i < values.length; i++) {
+    if (values[i][8] && values[i][8] !== '-') {
+      shouldSendMail = true
+    }
+  }
+  return shouldSendMail
+}

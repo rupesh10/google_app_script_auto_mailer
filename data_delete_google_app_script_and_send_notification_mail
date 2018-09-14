@@ -1,0 +1,52 @@
+
+function copyRange() {
+    var ss = SpreadsheetApp.getActive();
+    var s = ss.getSheetByName('Sheet Tab Name');
+    var sy = s.getRange('C2:I14').copyTo(ss.getSheetByName('Sheet Tab Name').getRange('B2:H14'))
+    //var st = s.getRange('I2:I14').clear();
+    var dataRange = s.getRange(1,2,2,8)
+    var data = dataRange.getValues();
+    var j=0
+    for (var i =0;i<1;i++) 
+    {
+     var row = data[i];
+     //Logger.log(row);  
+     var frd = row[8]; // username
+     Logger.log(frd); 
+     if(frd==''){
+     j = j+1
+  
+    }} 
+    if(j>0){
+    var dd_subject= 'Report number updation reminder in google spread Sheet ';
+    var dd_message = 'Hi  Please updated yesterday data in google spreadsheet so report will automatically send to managment' ;       // DD Message
+    var email = "mail id";
+    MailApp.sendEmail(email,dd_subject,dd_message)
+    Logger.log(j);
+}
+}  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

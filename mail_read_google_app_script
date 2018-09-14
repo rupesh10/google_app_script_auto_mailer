@@ -1,0 +1,25 @@
+function Mailreadero() {
+ var w = GmailApp.getInboxThreads(0,5)
+ var i = 0
+ var j = []
+
+ for ( i=0 ; i< w.length;i++) {
+   if ( w[i].getFirstMessageSubject() == "cron mailer name") {
+     var k = w[i].getId()
+     var kk = w[i].getLastMessageDate()
+     var messages = w[i].getMessages()
+     var lastMessage = messages[messages.length - 1]
+     var attachment = lastMessage.getAttachments()[0]
+  
+     // var data = w[i].getMessages()[0].getAttachments()[0].getDataAsString()
+     if (attachment) {
+       var data = attachment.getDataAsString()
+       var ardata = Utilities.parseCsv(data)
+       var l = ardata.length
+       Logger.log(data)
+       //var ss = SpreadsheetApp.openById("1-8gTELPAeM7lBm4WMRie6K1KaUwVoXy8YqdQKLOp17w")
+       var ss = SpreadsheetApp.openById("spread sheet id like this 1-8gTELPAeM7lBm4 ")
+       ss.getActiveSheet().getRange(1,1,l,3).setValues(ardata)
+     }
+   }
+ }
